@@ -1,0 +1,30 @@
+POST http://localhost:3003/users
+Content-Type: application/json
+
+{
+    "name": "Douglas Junior Alves",
+    "email": "djr_alves@gmail.com",
+    "password": "456hdjsncgd6387dhd74"
+}
+
+###
+
+POST http://localhost:3003/posts
+Content-Type: application/json
+
+{
+    "photo": "https://fastly.picsum.photos/id/17/2500/1667.jpg?hmac=HD-JrnNUZjFiP2UZQvWcKrgLoC_pc_ouUSWv8kHsJJY",
+    "description": "Trilha do final de semana",
+    "type": "normal",
+    "authorId": "9e539360-ab1d-43f8-9e63-3151b9f61411"
+}
+
+###
+
+GET http://localhost:3003/posts/661d9325-11a8-42e5-af13-fb9b0899fce1
+Content-Type: application/json
+
+###
+
+GET http://localhost:3003/posts
+Content-Type: application/json

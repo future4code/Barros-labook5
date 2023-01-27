@@ -1,12 +1,12 @@
-import { Request, Response } from "express"
-import { BaseDatabase } from "../data/BaseDatabase"
-import { PostDatabase } from "../data/PostDatabase"
 import { insertPostDTO } from "../models/insertPostDTO"
 import { post } from "../models/post"
 import { generateId } from "../services/generateId"
+import { PostRepository } from "./PostRepository"
+import { UserRepository } from "./UserRepository"
 
 
-export class PostBusiness extends BaseDatabase {
+export class PostBusiness {
+    constructor(private postDatabase: PostRepository, private userDatabase: UserRepository) {}
 
     createPost = async (input: insertPostDTO): Promise<void> => {
         try {
@@ -26,18 +26,26 @@ export class PostBusiness extends BaseDatabase {
                 throw new Error("Provide the post type.")
             }
 
+            if (input.type !== "normal" && input.type !== "event") {
+                throw new Error("The post type must be either 'normal' or 'event'.")
+            }
+
+            const userIdExists = await this.userDatabase.getUserById(input.authorId)
+            if (userIdExists.length === 0) {
+                throw new Error("User id not found.")
+            }
+
             const id: string = generateId()
             const newPost: post = {
                 id,
                 photo: input.photo,
                 description: input.description,
                 type: input.type,
-                createdAt: new Date(),
-                authorId: input.authorId
+                created_at: new Date(),
+                author_id: input.authorId
             }
 
-            const postDatabase = new PostDatabase()
-            await postDatabase.createPost(newPost)
+            await this.postDatabase.createPost(newPost)
         
         } catch (error:any) {
             throw new Error(error.message)
@@ -46,16 +54,15 @@ export class PostBusiness extends BaseDatabase {
     }
 
 
-    getPostById = async (id: string): Promise<any> => {
+    getPostById = async (id: string): Promise<post> => {
         try {
             if (!id) {
                 throw new Error("Provide the post id.")
             }
             
-            const postDatabase = new PostDatabase()
-            const result = await postDatabase.getPostById(id)
-            
-            if (result.length === 0) {
+            const result = await this.postDatabase.getPostById(id)
+
+            if (!result) {
                 throw new Error ("Id not found.")
             }
      
@@ -63,6 +70,16 @@ export class PostBusiness extends BaseDatabase {
 
         } catch (error:any) {
            throw new Error(error.message)
+        }
+    }
+
+
+    getAllPosts = async (): Promise<post[]> => {
+        try {
+            return await this.postDatabase.getAllPosts()
+            
+        } catch (error:any) {
+            throw new Error(error.message)
         }
     }
 }

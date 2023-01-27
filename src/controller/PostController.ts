@@ -1,10 +1,10 @@
 import { Request, Response } from "express"
 import { PostBusiness } from "../business/PostBusiness"
-import { BaseDatabase } from "../data/BaseDatabase"
 import { insertPostDTO } from "../models/insertPostDTO"
 
 
-export class PostController extends BaseDatabase {
+export class PostController {
+    constructor(private postBusiness: PostBusiness) {}
 
     createPost = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -15,8 +15,7 @@ export class PostController extends BaseDatabase {
                 authorId: req.body.authorId
             }
             
-            const postBusiness = new PostBusiness()
-            await postBusiness.createPost(input)
+            await this.postBusiness.createPost(input)
         
             res.status(201).send("Success! The post has been posted.")
         
@@ -29,10 +28,20 @@ export class PostController extends BaseDatabase {
     getPostById = async (req: Request, res: Response): Promise<void> => {
         try {
             const id = req.params.id
-            const postBusiness = new PostBusiness()
-            await postBusiness.getPostById(id)
+            const result = await this.postBusiness.getPostById(id)
 
-            res.status(200).send()
+            res.status(200).send(result)
+     
+        } catch (error:any) {
+            res.status(400).send(error.message)
+        }
+    }
+
+
+    getAllPosts = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const result = await this.postBusiness.getAllPosts()
+            res.status(200).send(result)
      
         } catch (error:any) {
             res.status(400).send(error.message)

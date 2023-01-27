@@ -1,13 +1,10 @@
 import { Response, Request } from "express"
 import { UserBusiness } from "../business/UserBusiness"
-import { BaseDatabase } from "../data/BaseDatabase"
 import { insertUserDTO } from "../models/insertUserDTO"
 
 
-export class UserController extends BaseDatabase {
-    constructor(private userBusiness: UserBusiness) {
-        super()
-    }
+export class UserController {
+    constructor(private userBusiness: UserBusiness) {}
 
     createUser = async (req: Request, res: Response): Promise<void> => {
         try {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev ./src/index.ts",
     "start": "tsc && node ./build/index.js",
-    "migrations": "tsc && node ./build/migrations.js"
+    "migrations": "tsc && node ./build/tablesSQL/migrations.js"
   },
   "author": "Francine Hahn",
   "license": "ISC",

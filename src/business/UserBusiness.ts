@@ -1,14 +1,11 @@
-import { BaseDatabase } from "../data/BaseDatabase"
 import { insertUserDTO } from "../models/insertUserDTO"
 import { user } from "../models/user"
 import { generateId } from "../services/generateId"
 import { UserRepository } from "./UserRepository"
 
 
-export class UserBusiness extends BaseDatabase {
-    constructor(private userDatabase: UserRepository){
-        super()
-    }
+export class UserBusiness {
+    constructor(private userDatabase: UserRepository){}
 
     createUser = async (input: insertUserDTO): Promise<void> => {
         try {
@@ -24,6 +21,11 @@ export class UserBusiness extends BaseDatabase {
                 throw new Error("Password must be provided.")
             }
      
+            const duplicateEmail = await this.userDatabase.getUserByEmail(input.email)
+            if (duplicateEmail.length > 0) {
+                throw new Error("This e-mail is already in use.")
+            }
+
             const id = generateId()
             const newUser: user = {
                 id,
