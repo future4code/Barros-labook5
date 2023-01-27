@@ -1,5 +1,6 @@
 import { Response, Request } from "express"
 import { UserBusiness } from "../business/UserBusiness"
+import { receiveDataToAddAfriendDTO } from "../models/receiveDataToAddAfriendDTO"
 import { insertUserDTO } from "../models/insertUserDTO"
 
 
@@ -17,6 +18,23 @@ export class UserController {
             await this.userBusiness.createUser(input)
             
             res.status(201).send("Success! The user has been registered.")
+     
+        } catch (error:any) {
+           res.status(400).send(error.message)
+        }
+    }
+
+
+    addAfriend = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const input: receiveDataToAddAfriendDTO = {
+                userIdThatAdded: req.body.userIdThatAdded,
+                userIdThatWasAdded: req.body.userIdThatWasAdded
+            }
+     
+            await this.userBusiness.addAfriend(input)
+            
+            res.status(201).send("Success! The user has been added.")
      
         } catch (error:any) {
            res.status(400).send(error.message)

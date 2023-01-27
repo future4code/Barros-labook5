@@ -13,8 +13,8 @@ POST http://localhost:3003/posts
 Content-Type: application/json
 
 {
-    "photo": "https://fastly.picsum.photos/id/17/2500/1667.jpg?hmac=HD-JrnNUZjFiP2UZQvWcKrgLoC_pc_ouUSWv8kHsJJY",
-    "description": "Trilha do final de semana",
+    "photo": "https://fastly.picsum.photos/id/42/3456/2304.jpg?hmac=dhQvd1Qp19zg26MEwYMnfz34eLnGv8meGk_lFNAJR3g",
+    "description": "Café da tarde em ótima companhia",
     "type": "normal",
     "authorId": "9e539360-ab1d-43f8-9e63-3151b9f61411"
 }
@@ -28,3 +28,13 @@ Content-Type: application/json
 
 GET http://localhost:3003/posts
 Content-Type: application/json
+
+###
+
+POST http://localhost:3003/users/friends
+Content-Type: application/json
+
+{
+    "userIdThatAdded": "9e539360-ab1d-43f8-9e63-3151b9f61411",
+    "userIdThatWasAdded": "6d48064a-fbf6-42ad-83d2-139aa9a65f5c"
+}

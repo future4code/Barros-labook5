@@ -30,7 +30,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
 
     getAllPosts = async (): Promise<post[]> => {
         try {
-            return await BaseDatabase.connection(this.TABLE).select()
+            return await BaseDatabase.connection(this.TABLE).select().orderBy("created_at", "desc")
      
         } catch (error:any) {
             throw new Error(error.message)

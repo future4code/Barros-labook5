@@ -1,5 +1,6 @@
 import { UserRepository } from "../business/UserRepository"
 import { BaseDatabase } from "../data/BaseDatabase"
+import { insertAnewFriendDTO } from "../models/insertNewFriendDTO"
 import { user } from "../models/user"
 
 
@@ -12,6 +13,16 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
      
         } catch (error:any) {
            throw new Error(error.message)
+        }
+    }
+
+
+    addAfriend = async (newFriend: insertAnewFriendDTO): Promise<void> => {
+        try {
+            await BaseDatabase.connection("labook_friends").insert(newFriend)
+     
+        } catch (error:any) {
+            throw new Error(error.message)
         }
     }
 
@@ -29,6 +40,16 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
     getUserById = async (id: string): Promise<any> => {
         try {
             return await BaseDatabase.connection(this.TABLE).select().where({id})
+     
+        } catch (error:any) {
+           throw new Error(error.message)
+        }
+    }
+
+
+    getFriendsByUserId = async (column: string, id: string): Promise<any> => {
+        try {
+            return await BaseDatabase.connection("labook_friends").select().where(column, id)
      
         } catch (error:any) {
            throw new Error(error.message)
