@@ -1,5 +1,5 @@
 export interface insertAnewFriendDTO {
     id: string,
-    userThatAdded_id: string,
-    userThatWasAdded_id: string
+    user_id: string,
+    friend_id: string
 }

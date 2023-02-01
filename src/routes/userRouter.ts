@@ -11,3 +11,5 @@ const userController = new UserController(userBusiness)
 
 userRouter.post("/", (req, res) => userController.createUser(req, res))
 userRouter.post("/friends", (req, res) => userController.addAfriend(req, res))
+userRouter.get("/friends/:id", (req, res) => userController.getFriendsByUserId(req, res))
+userRouter.post("/friends/:userId", (req, res) => userController.deleteAfriend(req, res))

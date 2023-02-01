@@ -1,6 +1,7 @@
 import { UserRepository } from "../business/UserRepository"
 import { BaseDatabase } from "../data/BaseDatabase"
 import { insertAnewFriendDTO } from "../models/insertNewFriendDTO"
+import { receiveFriendDataDTO } from "../models/receiveFriendDataDTO"
 import { user } from "../models/user"
 
 
@@ -27,6 +28,27 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
     }
 
 
+    deleteAfriend = async (input: receiveFriendDataDTO): Promise<void> => {
+        try {
+            await BaseDatabase.connection("labook_friends").where({"user_id": input.userId, "friend_id": input.friendId}).delete()
+            await BaseDatabase.connection("labook_friends").where({"user_id": input.friendId, "friend_id": input.userId}).delete()
+     
+        } catch (error:any) {
+            throw new Error(error.message)
+        }
+    }
+
+
+    getFriendsByUserId = async (item: any): Promise<any> => {
+        try {
+            return await BaseDatabase.connection("labook_friends").select().where(item)
+     
+        } catch (error:any) {
+           throw new Error(error.message)
+        }
+    }
+
+
     getUserByEmail = async (email: string): Promise<any> => {
         try {
             return await BaseDatabase.connection(this.TABLE).select().where({email})
@@ -40,16 +62,6 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
     getUserById = async (id: string): Promise<any> => {
         try {
             return await BaseDatabase.connection(this.TABLE).select().where({id})
-     
-        } catch (error:any) {
-           throw new Error(error.message)
-        }
-    }
-
-
-    getFriendsByUserId = async (column: string, id: string): Promise<any> => {
-        try {
-            return await BaseDatabase.connection("labook_friends").select().where(column, id)
      
         } catch (error:any) {
            throw new Error(error.message)

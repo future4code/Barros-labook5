@@ -2,9 +2,9 @@ POST http://localhost:3003/users
 Content-Type: application/json
 
 {
-    "name": "Douglas Junior Alves",
-    "email": "djr_alves@gmail.com",
-    "password": "456hdjsncgd6387dhd74"
+    "name": "Gabriel Silva Só",
+    "email": "gabriel.silvaso@hotmail.com",
+    "password": "456321uhuias"
 }
 
 ###
@@ -16,12 +16,12 @@ Content-Type: application/json
     "photo": "https://fastly.picsum.photos/id/42/3456/2304.jpg?hmac=dhQvd1Qp19zg26MEwYMnfz34eLnGv8meGk_lFNAJR3g",
     "description": "Café da tarde em ótima companhia",
     "type": "normal",
-    "authorId": "9e539360-ab1d-43f8-9e63-3151b9f61411"
+    "authorId": "2daec062-4f83-4e59-9eb7-718c70499536"
 }
 
 ###
 
-GET http://localhost:3003/posts/661d9325-11a8-42e5-af13-fb9b0899fce1
+GET http://localhost:3003/posts/04bd6186-f579-4148-bd18-ecba8d0ffb99
 Content-Type: application/json
 
 ###
@@ -35,6 +35,20 @@ POST http://localhost:3003/users/friends
 Content-Type: application/json
 
 {
-    "userIdThatAdded": "9e539360-ab1d-43f8-9e63-3151b9f61411",
-    "userIdThatWasAdded": "6d48064a-fbf6-42ad-83d2-139aa9a65f5c"
+    "userId": "618e9310-aacc-417c-bcbd-c215f1346fae",
+    "friendId": "2daec062-4f83-4e59-9eb7-718c70499536"
 }
+
+###
+
+POST http://localhost:3003/users/friends/618e9310-aacc-417c-bcbd-c215f1346fae
+Content-Type: application/json
+
+{
+    "friendId": "2daec062-4f83-4e59-9eb7-718c70499536"
+}
+
+###
+
+GET http://localhost:3003/users/friends/2daec062-4f83-4e59-9eb7-718c70499536
+Content-Type: application/json
