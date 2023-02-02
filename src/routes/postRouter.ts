@@ -12,5 +12,13 @@ const postBusiness = new PostBusiness(postDatabase, userDatabase)
 const postController = new PostController(postBusiness)
 
 postRouter.post("/", (req, res) => postController.createPost(req, res))
-postRouter.get("/:id", (req, res) => postController.getPostById(req, res))
 postRouter.get("/", (req, res) => postController.getAllPosts(req, res))
+
+postRouter.get("/:postId", (req, res) => postController.getPostById(req, res))
+
+postRouter.post("/likes/:postId", (req, res) => postController.likePost(req, res))
+postRouter.delete("/likes/:postId", (req, res) => postController.deslikePost(req, res))
+postRouter.get("/likes/:postId", (req, res) => postController.getLikesByPostId(req, res))
+
+postRouter.post("/comments/:postId", (req, res) => postController.commentOnPost(req, res))
+postRouter.get("/comments/:postId", (req, res) => postController.getCommentsByPostId(req, res))

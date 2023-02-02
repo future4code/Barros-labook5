@@ -1,15 +1,13 @@
-import { receiveFriendDataDTO } from "../models/receiveFriendDataDTO"
-import { insertUserDTO } from "../models/insertUserDTO"
-import { user } from "../models/user"
+import { friend, inputFriendDataDTO } from "../models/friend"
+import { user, inputUserDTO } from "../models/user"
 import { generateId } from "../services/generateId"
 import { UserRepository } from "./UserRepository"
-import { insertAnewFriendDTO } from "../models/insertNewFriendDTO"
 
 
 export class UserBusiness {
     constructor(private userDatabase: UserRepository){}
 
-    createUser = async (input: insertUserDTO): Promise<void> => {
+    createUser = async (input: inputUserDTO): Promise<void> => {
         try {
             if (!input.name) {
                 throw new Error("Name must be provided.")
@@ -44,7 +42,7 @@ export class UserBusiness {
     }
 
 
-    addAfriend = async (input: receiveFriendDataDTO): Promise<void> => {
+    addAfriend = async (input: inputFriendDataDTO): Promise<void> => {
         try {
             if (!input.userId) {
                 throw new Error ("Provide the user id that wants to add the new friend.")
@@ -59,12 +57,12 @@ export class UserBusiness {
             }
 
             const userIdExists = await this.userDatabase.getUserById(input.userId)
-            if (userIdExists.length === 0) {
+            if (!userIdExists) {
                 throw new Error("The user id who wants to add a new friend does not exist.")
             }
 
             const friendIdExists = await this.userDatabase.getUserById(input.friendId)
-            if (friendIdExists.length === 0) {
+            if (!friendIdExists) {
                 throw new Error("The user id who is about to be added does not exist.")
             }
 
@@ -76,7 +74,7 @@ export class UserBusiness {
             }
 
             const id = generateId()
-            const newFriend: insertAnewFriendDTO = {
+            const newFriend: friend = {
                 id,
                 user_id: input.userId,
                 friend_id: input.friendId
@@ -90,7 +88,7 @@ export class UserBusiness {
     }
 
 
-    deleteAfriend = async (input: receiveFriendDataDTO): Promise<void> => {
+    deleteAfriend = async (input: inputFriendDataDTO): Promise<void> => {
         try {
             if (!input.userId) {
                 throw new Error ("Provide the user id that wants to add the new friend.")
@@ -105,12 +103,12 @@ export class UserBusiness {
             }
 
             const userIdExists = await this.userDatabase.getUserById(input.userId)
-            if (userIdExists.length === 0) {
+            if (!userIdExists) {
                 throw new Error("The user id who wants to delete the friend does not exist.")
             }
 
             const friendIdExists = await this.userDatabase.getUserById(input.friendId)
-            if (friendIdExists.length === 0) {
+            if (!friendIdExists) {
                 throw new Error("The user id who is about to be deleted does not exist.")
             }
 
@@ -142,10 +140,10 @@ export class UserBusiness {
 
             const result: user[] = []
             let userFriends = await this.userDatabase.getFriendsByUserId({user_id: id})
-            userFriends.length !== 0? result.push(userFriends) : result.push()
+            userFriends.length !== 0? result.push(...userFriends) : result.push()
             
             userFriends = await this.userDatabase.getFriendsByUserId({friend_id: id})
-            userFriends.length !== 0? result.push(userFriends) : result.push()
+            userFriends.length !== 0? result.push(...userFriends) : result.push()
 
             if (result.length === 0) {
                 throw new Error("The user has no friends yet.")
@@ -153,6 +151,25 @@ export class UserBusiness {
 
             return result
      
+        } catch (error:any) {
+            throw new Error(error.message)
+        }
+    }
+
+
+    searchUsers = async (search: string): Promise<user[]> => {
+        try {
+            if (!search) {
+                throw new Error ("Provide a search term.")
+            }
+
+            const result = await this.userDatabase.searchUsers(search)
+            if (result.length === 0) {
+                throw new Error("No users have been found with the given search parameters.")
+            }
+
+            return result
+
         } catch (error:any) {
             throw new Error(error.message)
         }

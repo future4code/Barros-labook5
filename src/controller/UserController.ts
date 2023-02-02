@@ -1,7 +1,7 @@
 import { Response, Request } from "express"
 import { UserBusiness } from "../business/UserBusiness"
-import { receiveFriendDataDTO } from "../models/receiveFriendDataDTO"
-import { insertUserDTO } from "../models/insertUserDTO"
+import { inputFriendDataDTO } from "../models/friend"
+import { inputUserDTO } from "../models/user"
 
 
 export class UserController {
@@ -9,7 +9,7 @@ export class UserController {
 
     createUser = async (req: Request, res: Response): Promise<void> => {
         try {
-            const input: insertUserDTO = {
+            const input: inputUserDTO = {
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password
@@ -27,7 +27,7 @@ export class UserController {
 
     addAfriend = async (req: Request, res: Response): Promise<void> => {
         try {
-            const input: receiveFriendDataDTO = {
+            const input: inputFriendDataDTO = {
                 userId: req.body.userId,
                 friendId: req.body.friendId
             }
@@ -44,7 +44,7 @@ export class UserController {
 
     deleteAfriend = async (req: Request, res: Response): Promise<void> => {
         try {
-            const input: receiveFriendDataDTO = {
+            const input: inputFriendDataDTO = {
                 userId: req.params.userId,
                 friendId: req.body.friendId
             }
@@ -58,6 +58,7 @@ export class UserController {
         }
     }
 
+
     getFriendsByUserId = async (req: Request, res: Response): Promise<void> => {
         try {
             const id = req.params.id
@@ -70,4 +71,16 @@ export class UserController {
         }
     }
 
+    
+    searchUsers = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const search = req.query.search as string
+            const result = await this.userBusiness.searchUsers(search)
+            
+            res.status(200).send(result)
+     
+        } catch (error:any) {
+           res.status(400).send(error.message)
+        }
+    }
 }

@@ -7,11 +7,18 @@ This API Rest was developed to simulate a social media and to practice data arch
 
 ## Endpoints
 - Create User
+- Add User As A Friend
+- Delete User As A Friend
+- Search Users
+- Get Friends By User Id
 - Create Post
 - Get Post By Id
 - Get All Posts
-- Add User As a Friend
-- Delete User As a Friend
+- Like A Post
+- Deslike A Post
+- Get Likes By Post Id
+- Comment On A Post
+- Get Comments By Post Id
 
 ## Technologies
 - Typescript

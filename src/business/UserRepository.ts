@@ -1,12 +1,12 @@
-import { insertAnewFriendDTO } from "../models/insertNewFriendDTO"
-import { receiveFriendDataDTO } from "../models/receiveFriendDataDTO"
+import { friend, inputFriendDataDTO } from "../models/friend"
 import { user } from "../models/user"
 
 export interface UserRepository {
     createUser (newUser: user): Promise<void>
-    addAfriend (input: insertAnewFriendDTO): Promise<void>
-    deleteAfriend (input: receiveFriendDataDTO): Promise<void>
+    addAfriend (input: friend): Promise<void>
+    deleteAfriend (input: inputFriendDataDTO): Promise<void>
     getUserByEmail (email: string): Promise<any>
     getUserById (id: string): Promise<any>
-    getFriendsByUserId (item: receiveFriendDataDTO): Promise<any>
+    getFriendsByUserId (item: any): Promise<any>
+    searchUsers (search: string): Promise<user[]>
 }
