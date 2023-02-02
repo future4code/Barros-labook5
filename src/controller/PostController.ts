@@ -22,7 +22,7 @@ export class PostController {
             res.status(201).send("Success! The post has been posted.")
         
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
@@ -35,7 +35,7 @@ export class PostController {
             res.status(200).send(result)
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
@@ -51,39 +51,39 @@ export class PostController {
             res.status(200).send(result)
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
 
-    likePost = async (req: Request, res: Response): Promise<void> => {
+    likeApost = async (req: Request, res: Response): Promise<void> => {
         try {
             const input: inputLikePostDTO = {
                 userId: req.body.userId,
                 postId: req.params.postId
             }
 
-            await this.postBusiness.likePost(input)
+            await this.postBusiness.likeApost(input)
             res.status(201).send("Success! Your like has been registered.")
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
 
-    deslikePost = async (req: Request, res: Response): Promise<void> => {
+    deslikeApost = async (req: Request, res: Response): Promise<void> => {
         try {
             const input: inputLikePostDTO = {
                 userId: req.body.userId,
                 postId: req.params.postId
             }
 
-            await this.postBusiness.deslikePost(input)
+            await this.postBusiness.deslikeApost(input)
             res.status(201).send("Success! Your like has been deleted.")
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
@@ -96,7 +96,7 @@ export class PostController {
             res.status(200).send(result)
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
@@ -113,7 +113,7 @@ export class PostController {
             res.status(201).send("Success! Your comment has been registered.")
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 
@@ -126,7 +126,7 @@ export class PostController {
             res.status(200).send(result)
      
         } catch (error:any) {
-            res.status(400).send(error.message)
+            res.status(error.statusCode || 400).send(error.message || error.sqlMessage)
         }
     }
 }

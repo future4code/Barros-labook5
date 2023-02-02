@@ -1,5 +1,6 @@
 import { PostRepository } from "../business/PostRepository"
 import { BaseDatabase } from "../data/BaseDatabase"
+import { CustomError } from "../errors/CustomError"
 import { comment } from "../models/comment"
 import { like, inputLikePostDTO } from "../models/like"
 import { feedPaginationDTO, post } from "../models/post"
@@ -13,7 +14,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             await BaseDatabase.connection(this.TABLE).insert(newPost)
         
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
             
         }
     }
@@ -25,7 +26,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             return result[0]
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -35,27 +36,27 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             return await BaseDatabase.connection(this.TABLE).select().orderBy("created_at", "desc").limit(pagination.size).offset(pagination.offset)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
-    likePost = async (newLike: like): Promise<void> => {
+    likeApost = async (newLike: like): Promise<void> => {
         try {
             await BaseDatabase.connection("labook_likes").insert(newLike)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
-    deslikePost = async (input: inputLikePostDTO): Promise<void> => {
+    deslikeApost = async (input: inputLikePostDTO): Promise<void> => {
         try {
             await BaseDatabase.connection("labook_likes").where({user_id: input.userId, post_id: input.postId}).delete()
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -65,7 +66,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             return await BaseDatabase.connection("labook_likes").select().where("post_id", postId)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -75,7 +76,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             return await BaseDatabase.connection("labook_likes").select().where("user_id", userId)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -85,7 +86,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             await BaseDatabase.connection("labook_comments").insert(newComment)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -95,7 +96,7 @@ export class PostDatabase extends BaseDatabase implements PostRepository {
             return await BaseDatabase.connection("labook_comments").select().where("post_id", postId)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 }

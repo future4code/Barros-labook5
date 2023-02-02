@@ -16,8 +16,8 @@ postRouter.get("/", (req, res) => postController.getAllPosts(req, res))
 
 postRouter.get("/:postId", (req, res) => postController.getPostById(req, res))
 
-postRouter.post("/likes/:postId", (req, res) => postController.likePost(req, res))
-postRouter.delete("/likes/:postId", (req, res) => postController.deslikePost(req, res))
+postRouter.post("/likes/:postId", (req, res) => postController.likeApost(req, res))
+postRouter.delete("/likes/:postId", (req, res) => postController.deslikeApost(req, res))
 postRouter.get("/likes/:postId", (req, res) => postController.getLikesByPostId(req, res))
 
 postRouter.post("/comments/:postId", (req, res) => postController.commentOnPost(req, res))

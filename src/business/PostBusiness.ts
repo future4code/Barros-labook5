@@ -4,6 +4,9 @@ import { PostRepository } from "./PostRepository"
 import { UserRepository } from "./UserRepository"
 import { inputLikePostDTO, like } from "../models/like"
 import { comment, inputCommentDTO } from "../models/comment"
+import { CustomError } from "../errors/CustomError"
+import { DuplicateLike, InvalidDeslike, InvalidPostType, MissingAuthorId, MissingComment, MissingDescription, MissingPhotoUrl, MissingPostId, MissingPostType, NoCommentsFound, NoLikesFound, PostIdNotFound } from "../errors/PostError"
+import { MissingUserId, UserIdNotFound } from "../errors/UserError"
 
 
 export class PostBusiness {
@@ -12,28 +15,28 @@ export class PostBusiness {
     createPost = async (input: inputPostDTO): Promise<void> => {
         try {
             if (!input.authorId) {
-                throw new Error("Provide the author id.")
+                throw new MissingAuthorId()
             }
 
             if (!input.description) {
-                throw new Error("Provide the post description.")
+                throw new MissingDescription()
             }
 
             if (!input.photo) {
-                throw new Error("Provide the photo url.")
+                throw new MissingPhotoUrl()
             }
 
             if (!input.type) {
-                throw new Error("Provide the post type.")
+                throw new MissingPostType()
             }
 
             if (input.type !== "normal" && input.type !== "event") {
-                throw new Error("The post type must be either 'normal' or 'event'.")
+                throw new InvalidPostType()
             }
 
             const userIdExists = await this.userDatabase.getUserById(input.authorId)
-            if (userIdExists.length === 0) {
-                throw new Error("User id not found.")
+            if (!userIdExists) {
+                throw new UserIdNotFound()
             }
 
             const id: string = generateId()
@@ -49,28 +52,28 @@ export class PostBusiness {
             await this.postDatabase.createPost(newPost)
         
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
             
         }
     }
 
 
-    getPostById = async (id: string): Promise<post> => {
+    getPostById = async (postId: string): Promise<post> => {
         try {
-            if (!id) {
-                throw new Error("Provide the post id.")
+            if (postId === ":postId") {
+                throw new MissingPostId()
             }
             
-            const result = await this.postDatabase.getPostById(id)
+            const result = await this.postDatabase.getPostById(postId)
 
             if (!result) {
-                throw new Error ("Id not found.")
+                throw new PostIdNotFound()
             }
      
             return result
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -94,34 +97,34 @@ export class PostBusiness {
             return await this.postDatabase.getAllPosts(inputAllPosts)
             
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
-    likePost = async (input: inputLikePostDTO): Promise<void> => {
+    likeApost = async (input: inputLikePostDTO): Promise<void> => {
         try {
             if (!input.userId) {
-                throw new Error("Provide the user id.")
+                throw new MissingUserId()
             }
-            if (!input.postId) {
-                throw new Error("Provide the post id.")
+            if (input.postId === ":postId") {
+                throw new MissingPostId()
             }
             
             const userIdExists = await this.userDatabase.getUserById(input.userId)
             if (!userIdExists) {
-                throw new Error ("User not found.")
+                throw new UserIdNotFound()
             }
 
             const postIdExists = await this.postDatabase.getPostById(input.postId)
             if (!postIdExists) {
-                throw new Error ("Post not found.")
+                throw new PostIdNotFound()
             }
 
             const duplicateLike = await this.postDatabase.getLikesByUserId(input.userId)
             const filterDuplicatLike = duplicateLike.filter((item: like) => item.post_id === input.postId)
             if (filterDuplicatLike.length > 0) {
-                throw new Error("The user can't like the same post twice.")
+                throw new DuplicateLike()
             }
 
             const id = generateId()
@@ -131,67 +134,67 @@ export class PostBusiness {
                 post_id: input.postId
             }
 
-            await this.postDatabase.likePost(newLike)
+            await this.postDatabase.likeApost(newLike)
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
-    deslikePost = async (input: inputLikePostDTO): Promise<void> => {
+    deslikeApost = async (input: inputLikePostDTO): Promise<void> => {
         try {
             if (!input.userId) {
-                throw new Error("Provide the user id.")
+                throw new MissingUserId()
             }
-            if (!input.postId) {
-                throw new Error("Provide the post id.")
+            if (input.postId === ":postId") {
+                throw new MissingPostId()
             }
             
             const userIdExists = await this.userDatabase.getUserById(input.userId)
             if (!userIdExists) {
-                throw new Error ("User not found.")
+                throw new UserIdNotFound()
             }
 
             const postIdExists = await this.postDatabase.getPostById(input.postId)
             if (!postIdExists) {
-                throw new Error ("Post not found.")
+                throw new PostIdNotFound()
             }
 
             const getLikesByUserId = await this.postDatabase.getLikesByUserId(input.userId)
             const filterLikes = getLikesByUserId.filter((item: like) => item.post_id === input.postId)
             if (filterLikes.length === 0) {
-                throw new Error("It is not possible to dislike a post that has not been previously liked.")
+                throw new InvalidDeslike()
             }
 
-            await this.postDatabase.deslikePost(input)
+            await this.postDatabase.deslikeApost(input)
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
     getLikesByPostId = async (postId: string): Promise<like[]> => {
         try {
-            if (!postId) {
-                throw new Error("Provide the post id.")
+            if (postId === ":postId") {
+                throw new MissingPostId()
             }
 
             const postIdExists = await this.postDatabase.getPostById(postId)
             if (!postIdExists) {
-                throw new Error ("Post not found.")
+                throw new PostIdNotFound()
             }
 
             const result = await this.postDatabase.getLikesByPostId(postId)
             if (result.length === 0) {
-                throw new Error("This post does not have any likes yet.")
+                throw new NoLikesFound()
             }
 
             return result
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -199,23 +202,23 @@ export class PostBusiness {
     commentOnPost = async (input: inputCommentDTO): Promise<void> => {
         try {
             if (!input.comment) {
-                throw new Error("Provide the comment.")
+                throw new MissingComment()
             }
             if (!input.userId) {
-                throw new Error("Provide the user id.")
+                throw new MissingUserId()
             }
-            if (!input.postId) {
-                throw new Error("Provide the post id.")
+            if (input.postId === ":postId") {
+                throw new MissingPostId()
             }
             
             const userIdExists = await this.userDatabase.getUserById(input.userId)
             if (!userIdExists) {
-                throw new Error ("User not found.")
+                throw new UserIdNotFound()
             }
 
             const postIdExists = await this.postDatabase.getPostById(input.postId)
             if (!postIdExists) {
-                throw new Error ("Post not found.")
+                throw new PostIdNotFound()
             }
 
             const id = generateId()
@@ -229,31 +232,31 @@ export class PostBusiness {
             await this.postDatabase.commentOnPost(newComment)
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
     getCommentsByPostId = async (postId: string): Promise<comment[]> => {
         try {
-            if (!postId) {
-                throw new Error("Provide the post id.")
+            if (postId === ":postId") {
+                throw new MissingPostId()
             }
 
             const postIdExists = await this.postDatabase.getPostById(postId)
             if (!postIdExists) {
-                throw new Error ("Post not found.")
+                throw new PostIdNotFound()
             }
 
             const result = await this.postDatabase.getCommentsByPostId(postId)
             if (result.length === 0) {
-                throw new Error("This post does not have any comments yet.")
+                throw new NoCommentsFound()
             }
 
             return result
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 }

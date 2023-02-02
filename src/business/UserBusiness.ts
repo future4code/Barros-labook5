@@ -1,3 +1,5 @@
+import { CustomError } from "../errors/CustomError"
+import { CantAddFriend, CantDeleteFriend, DuplicateEmail, DuplicateId, FriendIdNotFound, MissingEmail, MissingFriendId, MissingName, MissingSearchTerm, MissingUserId, NoFriendsFound, NoUsersFound, UserIdNotFound } from "../errors/UserError"
 import { friend, inputFriendDataDTO } from "../models/friend"
 import { user, inputUserDTO } from "../models/user"
 import { generateId } from "../services/generateId"
@@ -10,20 +12,20 @@ export class UserBusiness {
     createUser = async (input: inputUserDTO): Promise<void> => {
         try {
             if (!input.name) {
-                throw new Error("Name must be provided.")
+                throw new MissingName()
             }
 
             if (!input.email) {
-                throw new Error("Email must be provided.")
+                throw new MissingEmail()
             }
 
             if (!input.password) {
-                throw new Error("Password must be provided.")
+                throw new MissingEmail()
             }
      
             const duplicateEmail = await this.userDatabase.getUserByEmail(input.email)
             if (duplicateEmail.length > 0) {
-                throw new Error("This e-mail is already in use.")
+                throw new DuplicateEmail()
             }
 
             const id = generateId()
@@ -37,40 +39,40 @@ export class UserBusiness {
             await this.userDatabase.createUser(newUser)
      
         } catch (error:any) {
-           throw new Error(error.message)
+           throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
     addAfriend = async (input: inputFriendDataDTO): Promise<void> => {
         try {
-            if (!input.userId) {
-                throw new Error ("Provide the user id that wants to add the new friend.")
+            if (input.userId === ":userId") {
+                throw new MissingUserId()
             }
 
             if (!input.friendId) {
-                throw new Error ("Provide the user id that is being added.")
+                throw new MissingFriendId()
             }
 
             if (input.userId === input.friendId) {
-                throw new Error("The user cannot add himself/herself.")
+                throw new DuplicateId()
             }
 
             const userIdExists = await this.userDatabase.getUserById(input.userId)
             if (!userIdExists) {
-                throw new Error("The user id who wants to add a new friend does not exist.")
+                throw new UserIdNotFound()
             }
 
             const friendIdExists = await this.userDatabase.getUserById(input.friendId)
             if (!friendIdExists) {
-                throw new Error("The user id who is about to be added does not exist.")
+                throw new FriendIdNotFound()
             }
 
             const userFriends = await this.userDatabase.getFriendsByUserId({user_id: input.userId, friend_id: input.friendId})
             const friendFriends = await this.userDatabase.getFriendsByUserId({user_id: input.friendId, friend_id: input.userId})
             
             if (userFriends.length > 0 || friendFriends.length > 0) {
-                throw new Error("It is not possible to add a user who is already a friend.")
+                throw new CantAddFriend()
             }
 
             const id = generateId()
@@ -83,76 +85,76 @@ export class UserBusiness {
             await this.userDatabase.addAfriend(newFriend)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
     deleteAfriend = async (input: inputFriendDataDTO): Promise<void> => {
         try {
-            if (!input.userId) {
-                throw new Error ("Provide the user id that wants to add the new friend.")
+            if (input.userId === ":userId") {
+                throw new MissingUserId()
             }
 
             if (!input.friendId) {
-                throw new Error ("Provide the user id that is being added.")
+                throw new MissingFriendId()
             }
 
             if (input.userId === input.friendId) {
-                throw new Error("The user cannot delete himself/herself.")
+                throw new DuplicateId()
             }
 
             const userIdExists = await this.userDatabase.getUserById(input.userId)
             if (!userIdExists) {
-                throw new Error("The user id who wants to delete the friend does not exist.")
+                throw new UserIdNotFound()
             }
 
             const friendIdExists = await this.userDatabase.getUserById(input.friendId)
             if (!friendIdExists) {
-                throw new Error("The user id who is about to be deleted does not exist.")
+                throw new FriendIdNotFound()
             }
 
             const userFriends = await this.userDatabase.getFriendsByUserId({user_id: input.userId, friend_id: input.friendId})
             const friendFriends = await this.userDatabase.getFriendsByUserId({user_id: input.friendId, friend_id: input.userId})
        
             if (userFriends.length === 0 && friendFriends.length === 0) {
-                throw new Error("The friend id is not included in the friend's list of the user id.")
+                throw new CantDeleteFriend()
             }
 
             await this.userDatabase.deleteAfriend(input)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
 
-    getFriendsByUserId = async (id: string): Promise<user[]> => {
+    getFriendsByUserId = async (userId: string): Promise<user[]> => {
         try {
-            if (!id) {
-                throw new Error ("Provide the user id.")
+            if (userId === ":userId") {
+                throw new MissingUserId()
             }
 
-            const userIdExists = await this.userDatabase.getUserById(id)
-            if (userIdExists.length === 0) {
-                throw new Error("The user id does not exist.")
+            const userIdExists = await this.userDatabase.getUserById(userId)
+            if (!userIdExists) {
+                throw new UserIdNotFound()
             }
 
             const result: user[] = []
-            let userFriends = await this.userDatabase.getFriendsByUserId({user_id: id})
+            let userFriends = await this.userDatabase.getFriendsByUserId({user_id: userId})
             userFriends.length !== 0? result.push(...userFriends) : result.push()
             
-            userFriends = await this.userDatabase.getFriendsByUserId({friend_id: id})
+            userFriends = await this.userDatabase.getFriendsByUserId({friend_id: userId})
             userFriends.length !== 0? result.push(...userFriends) : result.push()
 
             if (result.length === 0) {
-                throw new Error("The user has no friends yet.")
+                throw new NoFriendsFound()
             }
 
             return result
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -160,18 +162,18 @@ export class UserBusiness {
     searchUsers = async (search: string): Promise<user[]> => {
         try {
             if (!search) {
-                throw new Error ("Provide a search term.")
+                throw new MissingSearchTerm()
             }
 
             const result = await this.userDatabase.searchUsers(search)
             if (result.length === 0) {
-                throw new Error("No users have been found with the given search parameters.")
+                throw new NoUsersFound()
             }
 
             return result
 
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 }

@@ -1,5 +1,6 @@
 import { UserRepository } from "../business/UserRepository"
 import { BaseDatabase } from "../data/BaseDatabase"
+import { CustomError } from "../errors/CustomError"
 import { friend, inputFriendDataDTO } from "../models/friend"
 import { user } from "../models/user"
 
@@ -12,7 +13,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             await BaseDatabase.connection(this.TABLE).insert(newUser)
      
         } catch (error:any) {
-           throw new Error(error.message)
+           throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -22,7 +23,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             await BaseDatabase.connection("labook_friends").insert(newFriend)
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -33,7 +34,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             await BaseDatabase.connection("labook_friends").where({"user_id": input.friendId, "friend_id": input.userId}).delete()
      
         } catch (error:any) {
-            throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -43,7 +44,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             return await BaseDatabase.connection("labook_friends").select().where(item)
      
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -53,7 +54,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             return await BaseDatabase.connection(this.TABLE).select().where({email})
      
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -64,7 +65,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             return result[0]
 
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 
@@ -74,7 +75,7 @@ export class UserDatabase extends BaseDatabase implements UserRepository {
             return await BaseDatabase.connection(this.TABLE).select().where("name", "like", `%${search}%`)
             
         } catch (error:any) {
-           throw new Error(error.message)
+            throw new CustomError(error.statusCode, error.message)
         }
     }
 }
